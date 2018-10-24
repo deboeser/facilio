@@ -44,6 +44,8 @@ const theme = createMuiTheme({
 
 class App extends Component {
   render() {
+    console.log(theme);
+
     return (
       <Provider store={store}>
         <MuiThemeProvider theme={theme}>
