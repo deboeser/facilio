@@ -12,11 +12,13 @@ const setLoading = () => {
   return { type: SET_AUTH_LOADING };
 };
 
-const registerUser = userData => dispatch => {
+const registerUser = (userData, callback) => dispatch => {
   dispatch(setLoading());
   axios
     .post("/api/auth/register", userData)
-    .then(res => console.log("TODO: Success Registration Successful"))
+    .then(res => {
+      callback();
+    })
     .catch(err =>
       dispatch({
         type: GET_ERRORS,
@@ -32,7 +34,7 @@ const setCurrentUser = decoded => {
   };
 };
 
-const loginUser = (userData, history) => dispatch => {
+const loginUser = (userData, callback) => dispatch => {
   dispatch(setLoading());
   axios
     .post("/api/auth/login", userData)
@@ -43,7 +45,7 @@ const loginUser = (userData, history) => dispatch => {
       const decoded = jwt_decode(token);
       dispatch(setCurrentUser(decoded));
       dispatch({ type: RESET_ERRORS });
-      history.push("/auth");
+      callback();
     })
     .catch(err => {
       console.log(err);
