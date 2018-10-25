@@ -1,11 +1,14 @@
 import React, { Component } from "react";
-import { BrowserRouter as Router } from "react-router-dom";
+import { BrowserRouter as Router, Route } from "react-router-dom";
 import { Provider } from "react-redux";
 
 import jwt_decode from "jwt-decode";
 
 import MuiThemeProvider from "@material-ui/core/styles/MuiThemeProvider";
 import { createMuiTheme } from "@material-ui/core/styles";
+
+import WebApp from "./components/app/WebApp";
+import Login from "./components/auth/Login";
 
 import blue from "@material-ui/core/colors/blue";
 
@@ -59,7 +62,10 @@ class App extends Component {
       <Provider store={store}>
         <MuiThemeProvider theme={theme}>
           <Router>
-            <div className="App" id="app" />
+            <div className="App" id="app">
+              <Route path="/app" component={WebApp} />
+              <Route path="/login" component={Login} />
+            </div>
           </Router>
         </MuiThemeProvider>
       </Provider>
