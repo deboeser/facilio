@@ -3,7 +3,7 @@ import React from "react";
 import { withStyles } from "@material-ui/core/styles";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import green from "@material-ui/core/colors/green";
-import Button from "@material-ui/core/Button";
+import Button from "./Button";
 import classNames from "classnames";
 
 const styles = theme => ({

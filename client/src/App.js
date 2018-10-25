@@ -37,9 +37,15 @@ const random = {
 
 const theme = createMuiTheme({
   palette: {
-    primary: random,
+    primary: blue,
     secondary: blue
-  }
+  },
+  typography: {
+    fontFamily: "Raleway",
+    body2: {
+      fontWeight: 400
+    }
+  },
 });
 
 class App extends Component {
