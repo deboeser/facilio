@@ -46,6 +46,9 @@ const theme = createMuiTheme({
       fontWeight: 400
     }
   },
+  singleDialog: {
+    width: 400
+  }
 });
 
 class App extends Component {
