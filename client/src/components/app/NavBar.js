@@ -3,6 +3,9 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { compose } from "redux";
 import { withStyles } from "@material-ui/core/styles";
+import { withRouter } from "react-router-dom";
+
+import { logoutUser } from "../../actions/authActions";
 
 import Grid from "@material-ui/core/Grid";
 
@@ -38,6 +41,11 @@ const styles = theme => ({
 });
 
 class NavBar extends Component {
+  onLogoutClick = () => {
+    this.props.logoutUser();
+    this.props.history.push("/login/");
+  };
+
   render() {
     const { classes } = this.props;
     let menuLeft;
@@ -54,7 +62,12 @@ class NavBar extends Component {
 
     menuRight = (
       <div>
-        <Button className={classes.button} variant="outlined" color="primary">
+        <Button
+          className={classes.button}
+          variant="outlined"
+          color="primary"
+          onClick={this.onLogoutClick.bind(this)}
+        >
           Logout
         </Button>
       </div>
@@ -73,17 +86,22 @@ class NavBar extends Component {
 
 NavBar.propTypes = {
   classes: PropTypes.object.isRequired,
-  auth: PropTypes.object.isRequired
+  auth: PropTypes.object.isRequired,
+  logoutUser: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
   auth: state.auth
 });
 
+const mapDispatchToProps = {
+  logoutUser
+};
+
 export default compose(
   connect(
     mapStateToProps,
-    null
+    mapDispatchToProps
   ),
   withStyles(styles, { withTheme: true })
-)(NavBar);
+)(withRouter(NavBar));
