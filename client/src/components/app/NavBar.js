@@ -3,25 +3,20 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { compose } from "redux";
 import { withStyles } from "@material-ui/core/styles";
+import { withRouter } from "react-router-dom";
 
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
-import IconButton from "@material-ui/core/IconButton";
+import { logoutUser } from "../../actions/authActions";
+
 import Grid from "@material-ui/core/Grid";
-
-import MenuIcon from "@material-ui/icons/Menu";
 
 import Button from "../common/Button";
 
 const styles = theme => ({
   root: {
     flexGrow: 1
-    // backgroundColor: "#efefef"
   },
   menu: {
     maxWidth: theme.breakpoints.values.lg,
-    // backgroundColor: "#efefef",
     marginLeft: "auto",
     marginRight: "auto",
     paddingTop: theme.spacing.unit * 1.5,
@@ -46,6 +41,11 @@ const styles = theme => ({
 });
 
 class NavBar extends Component {
+  onLogoutClick = () => {
+    this.props.logoutUser();
+    this.props.history.push("/login/");
+  };
+
   render() {
     const { classes } = this.props;
     let menuLeft;
@@ -62,7 +62,12 @@ class NavBar extends Component {
 
     menuRight = (
       <div>
-        <Button className={classes.button} variant="outlined" color="primary">
+        <Button
+          className={classes.button}
+          variant="outlined"
+          color="primary"
+          onClick={this.onLogoutClick.bind(this)}
+        >
           Logout
         </Button>
       </div>
@@ -81,17 +86,22 @@ class NavBar extends Component {
 
 NavBar.propTypes = {
   classes: PropTypes.object.isRequired,
-  auth: PropTypes.object.isRequired
+  auth: PropTypes.object.isRequired,
+  logoutUser: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
   auth: state.auth
 });
 
+const mapDispatchToProps = {
+  logoutUser
+};
+
 export default compose(
   connect(
     mapStateToProps,
-    null
+    mapDispatchToProps
   ),
   withStyles(styles, { withTheme: true })
-)(NavBar);
+)(withRouter(NavBar));

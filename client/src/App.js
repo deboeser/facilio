@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { Provider } from "react-redux";
 
 import jwt_decode from "jwt-decode";
@@ -9,6 +9,7 @@ import { createMuiTheme } from "@material-ui/core/styles";
 
 import WebApp from "./components/app/WebApp";
 import Login from "./components/auth/Login";
+import PrivateRoute from "./components/common/PrivateRoute";
 
 import blue from "@material-ui/core/colors/blue";
 
@@ -63,8 +64,10 @@ class App extends Component {
         <MuiThemeProvider theme={theme}>
           <Router>
             <div className="App" id="app">
-              <Route path="/app" component={WebApp} />
-              <Route path="/login" component={Login} />
+              <Switch>
+                <PrivateRoute path="/app" component={WebApp} />
+              </Switch>
+              <Route exact path="/login" component={Login} />
             </div>
           </Router>
         </MuiThemeProvider>
