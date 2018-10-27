@@ -9,11 +9,7 @@ const hasExactRole = (userRole, requiredRole) => {
       reject({ code: 500, msg: { error: "Required role does not exist" } });
     }
 
-    if (userRole === requiredRole) {
-      resolve(true);
-    } else {
-      resolve(false);
-    }
+    resolve(userRole === requiredRole);
   });
 };
 
@@ -43,11 +39,7 @@ const hasMinimumRole = (userRole, requiredRole) => {
       reject({ code: 500, msg: { error: "Minimum role does not exist" } });
     }
 
-    if (requiredRoleLevel >= userRoleLevel) {
-      resolve(true);
-    } else {
-      resolve(false);
-    }
+    resolve(requiredRoleLevel >= userRoleLevel);
   });
 };
 
