@@ -2,6 +2,7 @@
 /.vscode
 package-lock.json
 
+# Exclude test environment for code snippets
 sandbox.js
 
 # Exclude configration files with credentials
