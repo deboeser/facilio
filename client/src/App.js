@@ -9,6 +9,7 @@ import { createMuiTheme } from "@material-ui/core/styles";
 
 import WebApp from "./components/app/WebApp";
 import Login from "./components/auth/Login";
+import Register from "./components/auth/Register";
 import PrivateRoute from "./components/common/PrivateRoute";
 
 import blue from "@material-ui/core/colors/blue";
@@ -68,6 +69,7 @@ class App extends Component {
                 <PrivateRoute path="/app" component={WebApp} />
               </Switch>
               <Route exact path="/login" component={Login} />
+              <Route exact path="/signup" component={Register} />
             </div>
           </Router>
         </MuiThemeProvider>

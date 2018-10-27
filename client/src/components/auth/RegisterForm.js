@@ -9,7 +9,7 @@ import { Link } from "react-router-dom";
 import Typography from "@material-ui/core/Typography";
 
 import isEmpty from "../../validation/is-empty";
-import { loginUser } from "../../actions/authActions";
+import { registerUser } from "../../actions/authActions";
 import { triggerSnack } from "../../actions/snackActions";
 
 import LoadingButton from "../common/LoadingButton";
@@ -29,19 +29,14 @@ const styles = theme => ({
   },
   secondaryActions: {
     marginTop: theme.spacing.unit * 1,
-    marginBottom: theme.spacing.unit * 4
+    textAlign: "center"
   },
-  forgot: {
-    float: "left",
-    color: theme.palette.grey[500]
-  },
-  signup: {
-    float: "right",
+  signin: {
     color: theme.palette.grey[500]
   }
 });
 
-class LoginForm extends Component {
+class RegisterForm extends Component {
   constructor(props) {
     super(props);
 
@@ -49,6 +44,7 @@ class LoginForm extends Component {
       loading: false,
       email: "",
       password: "",
+      password2: "",
       errors: {}
     };
   }
@@ -70,15 +66,16 @@ class LoginForm extends Component {
   onSubmit = e => {
     e.preventDefault();
 
-    const loginData = {
+    const signupData = {
       email: this.state.email,
-      password: this.state.password
+      password: this.state.password,
+      password2: this.state.password2
     };
-    this.props.loginUser(loginData, this.loginSuccess.bind(this));
+    this.props.registerUser(signupData, this.signupSuccess.bind(this));
   };
 
-  loginSuccess = e => {
-    this.props.history.push("/app");
+  signupSuccess = e => {
+    this.props.history.push("/login");
   };
 
   render() {
@@ -88,7 +85,7 @@ class LoginForm extends Component {
     return (
       <div className={classes.layout}>
         <Typography variant="h5" align="center">
-          Sign in
+          Sign Up
         </Typography>
         <form onSubmit={this.onSubmit} className={classes.form}>
           <TextField
@@ -110,6 +107,16 @@ class LoginForm extends Component {
             onChange={this.onChange.bind(this)}
             fullWidth
           />
+          <TextField
+            className={classes.textfield}
+            name="password2"
+            type="password"
+            label="Confirm Password"
+            error={!isEmpty(errors.password2)}
+            helperText={errors.password2}
+            onChange={this.onChange.bind(this)}
+            fullWidth
+          />
           <div className={classes.submit}>
             <LoadingButton
               type="submit"
@@ -118,18 +125,13 @@ class LoginForm extends Component {
               color="primary"
               fullWidth
             >
-              Sign In
+              Sign Up
             </LoadingButton>
           </div>
           <div className={classes.secondaryActions}>
-            <Link to="/forgot-password">
-              <Typography className={classes.forgot} variant="body2">
-                I forgot my password
-              </Typography>
-            </Link>
-            <Link to="/signup">
-              <Typography className={classes.signup} variant="body2">
-                Sign Up
+            <Link to="/login">
+              <Typography className={classes.signin} variant="body2">
+                Already have an account? Go to Sign In
               </Typography>
             </Link>
           </div>
@@ -139,8 +141,8 @@ class LoginForm extends Component {
   }
 }
 
-LoginForm.propTypes = {
-  loginUser: PropTypes.func.isRequired,
+RegisterForm.propTypes = {
+  registerUser: PropTypes.func.isRequired,
   triggerSnack: PropTypes.func.isRequired
 };
 
@@ -150,7 +152,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = {
-  loginUser,
+  registerUser,
   triggerSnack
 };
 
@@ -160,4 +162,4 @@ export default compose(
     mapStateToProps,
     mapDispatchToProps
   )
-)(withRouter(LoginForm));
+)(withRouter(RegisterForm));

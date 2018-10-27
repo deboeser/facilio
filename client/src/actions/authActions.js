@@ -2,6 +2,7 @@ import axios from "axios";
 import {
   GET_ERRORS,
   SET_AUTH_LOADING,
+  UNSET_AUTH_LOADING,
   SET_CURRENT_USER,
   RESET_ERRORS
 } from "./types";
@@ -17,6 +18,9 @@ const registerUser = (userData, callback) => dispatch => {
   axios
     .post("/api/auth/register", userData)
     .then(res => {
+      dispatch({
+        type: UNSET_AUTH_LOADING
+      });
       callback();
     })
     .catch(err =>
