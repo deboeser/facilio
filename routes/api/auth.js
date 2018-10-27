@@ -8,6 +8,8 @@ const keys = require("../../config/keys");
 const serverconfig = require("../../config/serverconfig");
 const passport = require("passport");
 const sendMail = require("../../utils/sendMail");
+const { minimumRole, exactRole } = require("../../roles/authenticateRole");
+const roles = require("../../roles/roles").roles;
 
 const {
   validateLoginInput,
@@ -45,7 +47,8 @@ router.post("/register", (req, res) => {
     } else {
       const newUser = new User({
         email: req.body.email,
-        password: req.body.password
+        password: req.body.password,
+        role: roles.NOROLE
       });
 
       // Password encryption with salt
@@ -87,7 +90,8 @@ router.post("/login", (req, res) => {
       if (isMatch) {
         const payload = {
           id: user.id,
-          email: user.email
+          email: user.email,
+          role: user.role
         };
         jwt.sign(
           payload,
@@ -116,10 +120,11 @@ router.post("/login", (req, res) => {
 router.get(
   "/current",
   passport.authenticate("jwt", { session: false }),
+  minimumRole(roles.MANAGER),
   (req, res) => {
     res.json({
-      id: req.user.id,
-      email: req.user.email
+      email: req.user.email,
+      role: req.user.role
     });
   }
 );

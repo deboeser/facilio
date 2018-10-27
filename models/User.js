@@ -17,11 +17,10 @@ const userSchema = new Schema({
     type: Date,
     default: Date.now
   },
-  roles: [
-    {
-      type: String
-    }
-  ]
+  role: {
+    type: String,
+    required: true
+  }
 });
 
 module.exports = User = mongoose.model("users", userSchema);
