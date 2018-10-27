@@ -2,44 +2,26 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 
+import Async from "react-promise";
+
 import { hasMinimumRole, hasExactRole } from "../../roles/authenticateRole";
 import { hierarchy } from "../../roles/roles";
 
-class Can extends Component {
-  constructor(props) {
-    super(props);
+const Can = props => {
+  const { exact, auth, requiredRole, children } = props;
+  const prom = exact
+    ? hasExactRole(auth.user.role, requiredRole)
+    : hasMinimumRole(auth.user.role, requiredRole);
 
-    this.state = {
-      loading: true
-    };
-    this.canSee = false;
-  }
-
-  componentDidMount = () => {
-    const userRole = this.props.auth.user.role;
-    const { requiredRole } = this.props;
-
-    if (this.props.exact) {
-      hasExactRole(userRole, requiredRole)
-        .then(result => {
-          this.canSee = result;
-          this.setState({ loading: false });
-        })
-        .catch(err => this.setState({ loading: false }));
-    } else {
-      hasMinimumRole(userRole, requiredRole)
-        .then(result => {
-          this.canSee = result;
-          this.setState({ loading: false });
-        })
-        .catch(err => this.setState({ loading: false }));
-    }
-  };
-
-  render() {
-    return <div>{this.canSee && this.props.children}</div>;
-  }
-}
+  return (
+    <Async
+      promise={prom}
+      then={hasRole => {
+        return hasRole && children;
+      }}
+    />
+  );
+};
 
 Can.propTypes = {
   requiredRole: PropTypes.oneOf(hierarchy).isRequired,
