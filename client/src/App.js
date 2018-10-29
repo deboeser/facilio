@@ -37,13 +37,17 @@ if (localStorage.jwtToken) {
 
 // A custom-defined color must have a 500 property
 const random = {
-  500: "#6A65F1"
+  500: "rgb(29, 130, 147)"
 };
 
 const theme = createMuiTheme({
   palette: {
-    primary: blue,
-    secondary: blue
+    primary: random,
+    secondary: blue,
+    gradients: {
+      tealBlue:
+        "linear-gradient(to right, rgb(29, 130, 147) 0%, rgb(32, 96, 160) 100%)"
+    }
   },
   typography: {
     fontFamily: "Raleway",

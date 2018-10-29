@@ -13,7 +13,10 @@ import Button from "../common/Button";
 
 const styles = theme => ({
   root: {
-    flexGrow: 1
+    flexGrow: 1,
+    position: "fixed",
+    background: theme.palette.gradients.tealBlue,
+    boxShadow: `0px 0px 2px 2px rgba(0, 0, 0, 0.14)`
   },
   menu: {
     maxWidth: theme.breakpoints.values.lg,
@@ -53,16 +56,25 @@ class NavBar extends Component {
 
     menuLeft = (
       <div>
-        <Button className={classes.button}>Dashboard</Button>
-        <Button className={classes.button}>Facilities</Button>
-        <Button className={classes.button}>Users</Button>
-        <Button className={classes.button}>Bookings</Button>
+        <Button className={classes.button} white>
+          Dashboard
+        </Button>
+        <Button className={classes.button} white>
+          Facilities
+        </Button>
+        <Button className={classes.button} white>
+          Users
+        </Button>
+        <Button className={classes.button} white>
+          Bookings
+        </Button>
       </div>
     );
 
     menuRight = (
       <div>
         <Button
+          white
           className={classes.button}
           variant="outlined"
           color="primary"

@@ -27,6 +27,9 @@ const styles = theme => ({
   submit: {
     marginTop: theme.spacing.unit * 3
   },
+  submitButton: {
+    background: theme.palette.gradients.tealBlue
+  },
   secondaryActions: {
     marginTop: theme.spacing.unit * 1,
     textAlign: "center"
@@ -123,6 +126,7 @@ class RegisterForm extends Component {
               loading={this.props.auth.loading}
               variant="contained"
               color="primary"
+              className={classes.submitButton}
               fullWidth
             >
               Sign Up

@@ -35,9 +35,12 @@ const LoadingButton = props => {
     type: props.type
   };
 
-  const buttonClassname = classNames({
-    [classes.buttonSuccess]: success
-  });
+  const buttonClassname = classNames(
+    {
+      [classes.buttonSuccess]: success
+    },
+    { [props.className]: !loading }
+  );
 
   return (
     <div className={classes.wrapper}>
