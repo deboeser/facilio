@@ -16,7 +16,11 @@ const styles = theme => ({
     flexGrow: 1,
     position: "fixed",
     background: theme.palette.gradients.tealBlue,
-    boxShadow: `0px 0px 2px 2px rgba(0, 0, 0, 0.14)`
+    boxShadow: `0px 0px 2px 2px rgba(0, 0, 0, 0.14)`,
+    zIndex: 1100
+  },
+  spacing: {
+    height: "60px"
   },
   menu: {
     maxWidth: theme.breakpoints.values.lg,
@@ -86,12 +90,15 @@ class NavBar extends Component {
     );
 
     return (
-      <Grid container className={classes.root} spacing={0}>
-        <Grid item xs={12} className={classes.menu}>
-          <div className={classes.menuLeft}>{menuLeft}</div>
-          <div className={classes.menuRight}>{menuRight}</div>
+      <div>
+        <Grid container className={classes.root} spacing={0}>
+          <Grid item xs={12} className={classes.menu}>
+            <div className={classes.menuLeft}>{menuLeft}</div>
+            <div className={classes.menuRight}>{menuRight}</div>
+          </Grid>
         </Grid>
-      </Grid>
+        <div className={classes.spacing} />
+      </div>
     );
   }
 }
