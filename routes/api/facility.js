@@ -315,6 +315,6 @@ router.delete(
   }
 );
 
-// TODO: DeActivate Resources and Facilities
+// TODO: De/Activate Resources and Facilities
 
 module.exports = router;

@@ -11,11 +11,11 @@ const facilitySchema = new Schema({
   },
   deposit: {
     type: Number,
-    default: 0
+    required: true
   },
   price: {
     type: Number,
-    default: 0
+    required: true
   },
   confirmation: {
     type: Boolean,
@@ -28,6 +28,22 @@ const facilitySchema = new Schema({
   description: {
     type: String
   },
+  slotOrInterval: {
+    type: Boolean,
+    default: true
+  },
+  slots: [
+    {
+      from: {
+        type: Date,
+        required: true
+      },
+      to: {
+        type: Date,
+        required: true
+      }
+    }
+  ],
   // bookingFrom: {
   //   type: Number,
   //   required: true
@@ -36,26 +52,12 @@ const facilitySchema = new Schema({
   //   type: Number,
   //   required: true
   // },
-  // slotOrInterval: {
-  //   type: Boolean,
-  //   required: true
-  // },
   // bookingMax: {
   //   type: Number
   // },
   // interval: {
   //   type: Number
   // },
-  // slots: [
-  //   {
-  //     from: {
-  //       type: Number
-  //     },
-  //     to: {
-  //       type: Number
-  //     }
-  //   }
-  // ],
   resources: [
     {
       type: Schema.Types.ObjectId,
