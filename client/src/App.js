@@ -36,14 +36,20 @@ if (localStorage.jwtToken) {
 }
 
 // A custom-defined color must have a 500 property
-const random = {
-  500: "rgb(29, 130, 147)"
+const secondaryColor = {
+  500: "rgb(29, 130, 147)",
+  A400: "rgb(29, 130, 147)"
+};
+
+const primaryColor = {
+  500: "rgb(32, 96, 160)",
+  A400: "rgb(32, 96, 160)"
 };
 
 const theme = createMuiTheme({
   palette: {
-    primary: random,
-    secondary: blue,
+    primary: primaryColor,
+    secondary: secondaryColor,
     gradients: {
       tealBlue:
         "linear-gradient(to right, rgb(29, 130, 147) 0%, rgb(32, 96, 160) 100%)"
