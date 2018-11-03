@@ -81,6 +81,26 @@ router.get(
   }
 );
 
+router.get(
+  "/exists/:name(*)",
+  passport.authenticate("jwt", { session: false }),
+  minimumRole(roles.MANAGER),
+  (req, res) => {
+    const errors = {};
+
+    Facility.findOne({ name: req.params.name })
+      .then(result => {
+        if (!result) {
+          return res.json({ exists: false });
+        }
+        return res.json({ exists: true });
+      })
+      .catch(err => {
+        res.status(500).json(err);
+      });
+  }
+);
+
 router.post(
   "/create/",
   passport.authenticate("jwt", { session: false }),
