@@ -127,7 +127,8 @@ router.post(
               price: parsed.priceNumeric,
               confirmation: parsed.confirmation,
               description: req.body.description,
-              resources: resourcesIds
+              resources: resourcesIds,
+              slots: req.body.slots
             };
 
             new Facility(newFacility)
