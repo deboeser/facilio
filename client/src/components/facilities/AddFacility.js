@@ -255,7 +255,7 @@ class AddFacility extends Component {
               variant="contained"
               color="primary"
               onClick={this.handleNext}
-              disabled={this.state.loading} // || !this.activeStepValid()}
+              disabled={this.state.loading || !this.activeStepValid()}
             >
               {activeStep === steps.length - 1 ? "Add New Facility" : "Next"}
             </Button>
