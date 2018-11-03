@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { withStyles } from "@material-ui/core/styles";
 import PropTypes from "prop-types";
+import axios from "axios";
 
 import Grid from "@material-ui/core/Grid";
 import TextField from "../../common/TextField";
@@ -38,6 +39,46 @@ class Step1 extends Component {
     };
   }
 
+  componentWillUpdate() {
+    this.stepValid();
+  }
+
+  componentDidMount() {
+    this.stepValid();
+  }
+
+  stepValid = () => {
+    const { superState } = this.props;
+    let stepValid = true;
+    stepValid = stepValid && isEmpty(this.state.errors);
+    stepValid = stepValid && !isEmpty(superState.facilityName);
+    stepValid = stepValid && !isEmpty(superState.facilityType);
+
+    if (stepValid !== superState.valid.step0) {
+      let { valid } = superState;
+      valid.step0 = stepValid;
+      this.props.setSuperState({ valid: valid });
+    }
+  };
+
+  onBlurName = e => {
+    this.props.setSuperState({ loading: true });
+    // TODO: Load facilities in redux instead of requesting it from server
+    axios
+      .get(`/api/facility/exists/${this.props.superState.facilityName}`)
+      .then(res => {
+        let errors = this.state.errors;
+        if (res.data.exists) {
+          errors.facilityName = "A facility with this name already exists";
+          this.setState({ errors: errors });
+        } else {
+          delete errors.facilityName;
+          this.setState({ errors: errors });
+        }
+        this.props.setSuperState({ loading: false });
+      });
+  };
+
   onBlurCurrency = e => {
     let value;
     this.props.handleStateChange(e);
@@ -47,17 +88,28 @@ class Step1 extends Component {
         let errors = this.state.errors;
         errors[e.target.name] = "Must be a numeric value";
         this.setState({ errors: errors });
+      } else if (value < 0) {
+        let errors = this.state.errors;
+        errors[e.target.name] = "Cannot be a negative value";
+        this.setState({ errors: errors });
       } else {
         let errors = this.state.errors;
-        errors[e.target.name] = "";
+        delete errors[e.target.name];
         this.setState({ errors: errors });
         let eNew = { target: { name: e.target.name, value: value.toFixed(2) } };
         this.props.handleStateChange(eNew);
       }
-    } else {
-      let errors = this.state.errors;
-      errors[e.target.name] = "Fee field is required";
+    }
+  };
+
+  handleToggle = field => e => {
+    this.props.handleStateToggle(e);
+    if (!isEmpty(this.state.errors[field])) {
+      let { errors } = this.state;
+      delete errors[field];
       this.setState({ errors: errors });
+      let eFake = { target: { name: field, value: "" } };
+      this.props.handleStateChange(eFake);
     }
   };
 
@@ -136,15 +188,16 @@ class Step1 extends Component {
               fullWidth
             />
           </Grid>
-
           <Grid item xs={12}>
             <TextField
               name="facilityName"
               label="Facility Name"
               value={superState.facilityName}
               onChange={handleStateChange}
+              onBlur={this.onBlurName}
               className={classes.textfield}
-              helperText="This will be the name visible to your residents."
+              helperText={this.state.errors.facilityName}
+              error={!isEmpty(this.state.errors.facilityName)}
               fullWidth
             />{" "}
           </Grid>
@@ -172,7 +225,7 @@ class Step1 extends Component {
                 <Checkbox
                   name="requiresDeposit"
                   checked={superState.requiresDeposit}
-                  onChange={handleStateToggle}
+                  onChange={this.handleToggle("facilityDeposit").bind(this)}
                   color="primary"
                 />
               }
@@ -191,7 +244,7 @@ class Step1 extends Component {
                 <Checkbox
                   name="requiresFee"
                   checked={superState.requiresFee}
-                  onChange={handleStateToggle}
+                  onChange={this.handleToggle("facilityFee").bind(this)}
                   color="primary"
                 />
               }
@@ -208,6 +261,7 @@ class Step1 extends Component {
 Step1.propTypes = {
   handleStateChange: PropTypes.func.isRequired,
   handleStateToggle: PropTypes.func.isRequired,
+  setSuperState: PropTypes.func.isRequired,
   superState: PropTypes.object.isRequired
 };
 
