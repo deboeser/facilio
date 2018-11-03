@@ -11,6 +11,10 @@ const validateNewFacilityInput = data => {
   data.price = !isEmpty(data.price) ? data.price : "";
   data.confirmation = !isEmpty(data.confirmation) ? data.confirmation : "";
 
+  if (isEmpty(data.slots)) {
+    errors.slots = "At least one slot required";
+  }
+
   if (Validator.isEmpty(data.name)) {
     errors.name = "Name is required";
   } else if (!Validator.isLength(data.name, { min: 3, max: 30 })) {
@@ -24,7 +28,7 @@ const validateNewFacilityInput = data => {
   parsed.depositNumeric = Number(data.deposit);
   parsed.priceNumeric = Number(data.price);
 
-  if (Validator.isEmpty(data.deposit)) {
+  if (Validator.isEmpty(String(data.deposit))) {
     errors.deposit = "Deposit field is required";
   } else if (isNaN(parsed.depositNumeric)) {
     errors.deposit = "Deposit must be a numeric value";
@@ -32,7 +36,7 @@ const validateNewFacilityInput = data => {
     errors.deposit = "Deposit cannot be negative";
   }
 
-  if (Validator.isEmpty(data.price)) {
+  if (Validator.isEmpty(String(data.price))) {
     errors.price = "Price field is required";
   } else if (isNaN(parsed.priceNumeric)) {
     errors.price = "Price must be a numeric value";
@@ -42,9 +46,12 @@ const validateNewFacilityInput = data => {
 
   parsed.confirmation = data.confirmation === "true";
 
-  if (Validator.isEmpty(data.confirmation)) {
+  if (Validator.isEmpty(String(data.confirmation))) {
     errors.confirmation = "Confirmation field is required";
-  } else if (data.confirmation !== "true" && data.confirmation !== "false") {
+  } else if (
+    String(data.confirmation) !== "true" &&
+    String(data.confirmation) !== "false"
+  ) {
     errors.confirmation = "Confirmation must be true or false";
   }
 
