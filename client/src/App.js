@@ -6,6 +6,8 @@ import jwt_decode from "jwt-decode";
 
 import MuiThemeProvider from "@material-ui/core/styles/MuiThemeProvider";
 import { createMuiTheme } from "@material-ui/core/styles";
+import MomentUtils from "material-ui-pickers/utils/moment-utils";
+import MuiPickersUtilsProvider from "material-ui-pickers/MuiPickersUtilsProvider";
 
 import WebApp from "./components/app/WebApp";
 import Login from "./components/auth/Login";
@@ -73,15 +75,17 @@ class App extends Component {
     return (
       <Provider store={store}>
         <MuiThemeProvider theme={theme}>
-          <Router>
-            <div className="App" id="app">
-              <Switch>
-                <PrivateRoute path="/app" component={WebApp} />
-              </Switch>
-              <Route exact path="/login" component={Login} />
-              <Route exact path="/signup" component={Register} />
-            </div>
-          </Router>
+          <MuiPickersUtilsProvider utils={MomentUtils}>
+            <Router>
+              <div className="App" id="app">
+                <Switch>
+                  <PrivateRoute path="/app" component={WebApp} />
+                </Switch>
+                <Route exact path="/login" component={Login} />
+                <Route exact path="/signup" component={Register} />
+              </div>
+            </Router>
+          </MuiPickersUtilsProvider>
         </MuiThemeProvider>
       </Provider>
     );
