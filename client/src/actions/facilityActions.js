@@ -21,4 +21,22 @@ const getFacilities = () => dispatch => {
     });
 };
 
-export { getFacilities };
+const deleteFacility = (id, callback) => dispatch => {
+  console.log(id);
+  dispatch(setLoading());
+  axios
+    .delete(`/api/facility/${id}`)
+    .then(res => {
+      console.log("success");
+      getFacilities()(dispatch);
+      if (typeof callback === "function") {
+        callback();
+      }
+    })
+    .catch(err => {
+      // TODO: Proper handling if failed
+      console.log(err.response.data);
+    });
+};
+
+export { getFacilities, deleteFacility };
