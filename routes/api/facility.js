@@ -309,11 +309,11 @@ router.post(
 );
 
 router.delete(
-  "/",
+  "/:id",
   passport.authenticate("jwt", { session: false }),
   minimumRole(roles.MANAGER),
   (req, res) => {
-    Facility.findOne({ _id: req.body.id }).then(result => {
+    Facility.findOne({ _id: req.params.id }).then(result => {
       if (!result) {
         return res.status(400).json({ notfound: "Facility ID not found" });
       }
@@ -325,7 +325,7 @@ router.delete(
 
       Promise.all(removePromises)
         .then(values => {
-          Facility.findOneAndRemove({ _id: req.body.id })
+          Facility.findOneAndRemove({ _id: req.params.id })
             .then(() => {
               return res.json({ success: true });
             })
