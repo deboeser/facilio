@@ -6,6 +6,7 @@ const passport = require("passport");
 // Importing routes
 const auth = require("./routes/api/auth");
 const facility = require("./routes/api/facility");
+const booking = require("./routes/api/booking");
 
 // Init Server, bodyParser, connect to MongoDB
 const app = express();
@@ -30,6 +31,7 @@ require("./config/passport")(passport);
 app.get("/", (req, res) => res.send("Hello"));
 app.use("/api/auth", auth);
 app.use("/api/facility", facility);
+app.use("/api/booking", booking);
 
 // Starting server listening
 app.listen(port, () => console.log(`Server running on port ${port}`));
