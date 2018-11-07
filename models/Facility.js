@@ -35,11 +35,11 @@ const facilitySchema = new Schema({
   slots: [
     {
       from: {
-        type: Date,
+        type: String,
         required: true
       },
       to: {
-        type: Date,
+        type: String,
         required: true
       }
     }
