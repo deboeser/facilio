@@ -4,9 +4,12 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 import Grid from "@material-ui/core/Grid";
 
+import { roles } from "../../roles/roles";
+
 import NavBar from "./NavBar";
 import Facilities from "../facilities/Facilities";
 import AddFacility from "../facilities/AddFacility";
+import ProtectedRoute from "../common/ProtectedRoute";
 
 const styles = theme => ({
   root: {
@@ -48,14 +51,20 @@ class WebApp extends Component {
           <Grid container className={classes.wrapper} spacing={0}>
             <Grid item xs={12} className={classes.body}>
               <div className={classes.content}>
-                <Route
-                  path={`${match.path}/facilities`}
-                  component={Facilities}
-                />
-                <Route
-                  path={`${match.path}/add-facility`}
-                  component={AddFacility}
-                />
+                <Switch>
+                  <ProtectedRoute
+                    path={`${match.path}/facilities`}
+                    component={Facilities}
+                    requiredRole={roles.MANAGER}
+                  />
+                </Switch>
+                <Switch>
+                  <ProtectedRoute
+                    path={`${match.path}/add-facility`}
+                    component={AddFacility}
+                    requiredRole={roles.MANAGER}
+                  />
+                </Switch>
               </div>
             </Grid>
           </Grid>
