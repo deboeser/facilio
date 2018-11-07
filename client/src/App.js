@@ -14,7 +14,7 @@ import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
 import PrivateRoute from "./components/common/PrivateRoute";
 
-import blue from "@material-ui/core/colors/blue";
+import red from "@material-ui/core/colors/red";
 
 import store from "./store";
 import setAuthToken from "./utils/setAuthToken";
@@ -52,6 +52,7 @@ const theme = createMuiTheme({
   palette: {
     primary: primaryColor,
     secondary: secondaryColor,
+    warning: red,
     gradients: {
       tealBlue:
         "linear-gradient(to right, rgb(29, 130, 147) 0%, rgb(32, 96, 160) 100%)"

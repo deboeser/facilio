@@ -9,6 +9,7 @@ import Divider from "@material-ui/core/Divider";
 
 import Button from "../common/Button";
 import Stepper from "../common/Stepper";
+import Tooltip from "../common/Tooltip";
 import Step1 from "./AddFacilitySteps/Step1";
 import Step2 from "./AddFacilitySteps/Step2";
 import Step3 from "./AddFacilitySteps/Step3";
@@ -61,10 +62,29 @@ class AddFacility extends Component {
   constructor(props) {
     super(props);
 
+    this.state = { ...this.createInitialState() };
+  }
+
+  createInitialState = () => {
     const now = new Date();
     const then = new Date(new Date().setHours(now.getHours() + 1));
 
-    this.state = {
+    const baseValid = {
+      step0: false,
+      step1: false,
+      step2: false
+    };
+
+    const baseSlots = [
+      {
+        from: now,
+        to: then,
+        errorFrom: "",
+        errorTo: ""
+      }
+    ];
+
+    return {
       activeStep: 0,
       skipped: new Set(),
       facilityType: "",
@@ -77,26 +97,13 @@ class AddFacility extends Component {
       loading: false,
       saveLoading: true,
       facilityResources: ["Resource 1"],
-      valid: {
-        step0: false,
-        step1: false,
-        step2: false
-      },
-      facilitySlots: [
-        {
-          from: now,
-          to: then,
-          errorFrom: "",
-          errorTo: ""
-        }
-      ]
+      valid: { ...baseValid },
+      facilitySlots: [...baseSlots]
     };
-
-    this.baseState = this.state;
-  }
+  };
 
   resetComponent = () => {
-    this.setState({ ...this.baseState });
+    this.setState({ ...this.createInitialState() });
   };
 
   handleNext = () => {
@@ -245,7 +252,9 @@ class AddFacility extends Component {
       buttonSection = (
         <div className={classes.buttonSection}>
           <div className={classes.stepperButtonsLeft}>
-            <Button onClick={this.saveFacility}>Cancel</Button>
+            <Tooltip title="Reset this wizard" placement="top-start">
+              <Button onClick={this.resetComponent}>Reset</Button>
+            </Tooltip>
           </div>
           <div className={classes.stepperButtonsRight}>
             <Button disabled={activeStep === 0} onClick={this.handleBack}>
@@ -255,7 +264,7 @@ class AddFacility extends Component {
               variant="contained"
               color="primary"
               onClick={this.handleNext}
-              disabled={this.state.loading} // || !this.activeStepValid()}
+              disabled={this.state.loading || !this.activeStepValid()}
             >
               {activeStep === steps.length - 1 ? "Add New Facility" : "Next"}
             </Button>

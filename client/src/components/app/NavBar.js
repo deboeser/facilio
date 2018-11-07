@@ -3,13 +3,14 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { compose } from "redux";
 import { withStyles } from "@material-ui/core/styles";
-import { withRouter } from "react-router-dom";
+import { withRouter, Link } from "react-router-dom";
 
 import { logoutUser } from "../../actions/authActions";
 
 import Grid from "@material-ui/core/Grid";
 
 import Button from "../common/Button";
+import Can from "../common/Can";
 
 const styles = theme => ({
   root: {
@@ -63,15 +64,28 @@ class NavBar extends Component {
         <Button className={classes.button} white>
           Dashboard
         </Button>
-        <Button className={classes.button} white>
-          Facilities
-        </Button>
-        <Button className={classes.button} white>
-          Users
-        </Button>
-        <Button className={classes.button} white>
-          Bookings
-        </Button>
+        <Can requiredRole="MANAGER">
+          <Link to="/app/facilities">
+            <Button className={classes.button} white>
+              Facilities
+            </Button>
+          </Link>
+        </Can>
+        <Can requiredRole="MANAGER">
+          <Button className={classes.button} white>
+            Users
+          </Button>
+        </Can>
+        <Can requiredRole="MANAGER">
+          <Button className={classes.button} white>
+            Bookings
+          </Button>
+        </Can>
+        <Can requiredRole="USER" exact>
+          <Button className={classes.button} white>
+            New Booking
+          </Button>
+        </Can>
       </div>
     );
 
