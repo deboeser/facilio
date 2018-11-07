@@ -18,6 +18,7 @@ const {
   validateResourceAddInput
 } = require("../../validation/facility");
 
+// Get all facilities
 router.get(
   "/",
   passport.authenticate("jwt", { session: false }),
@@ -44,6 +45,7 @@ router.get(
   }
 );
 
+// Get facility by ID
 router.get(
   "/id/:id",
   passport.authenticate("jwt", { session: false }),
@@ -81,6 +83,7 @@ router.get(
   }
 );
 
+// Check if facility with certain name exists
 router.get(
   "/exists/:name(*)",
   passport.authenticate("jwt", { session: false }),
@@ -101,6 +104,7 @@ router.get(
   }
 );
 
+// Create a new facility
 router.post(
   "/create/",
   passport.authenticate("jwt", { session: false }),
@@ -181,6 +185,7 @@ router.post(
   }
 );
 
+// Update an existing facility
 router.post(
   "/update/",
   passport.authenticate("jwt", { session: false }),
@@ -209,6 +214,7 @@ router.post(
   }
 );
 
+// Delete a resource
 router.delete(
   "/resource",
   passport.authenticate("jwt", { session: false }),
@@ -261,6 +267,7 @@ router.delete(
   }
 );
 
+// Create a new resource
 router.post(
   "/resource",
   passport.authenticate("jwt", { session: false }),
@@ -308,6 +315,7 @@ router.post(
   }
 );
 
+// Delete a facility by ID
 router.delete(
   "/:id",
   passport.authenticate("jwt", { session: false }),
