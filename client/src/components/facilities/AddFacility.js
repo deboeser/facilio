@@ -16,7 +16,6 @@ import Step3 from "./AddFacilitySteps/Step3";
 import Finished from "./AddFacilitySteps/Finished";
 
 import isEmpty from "../../validation/is-empty";
-import { datetimeToTimestring } from "../../utils/timeDateConversion";
 
 const styles = theme => ({
   root: {
@@ -221,21 +220,13 @@ class AddFacility extends Component {
 
   saveFacility = () => {
     const { state } = this;
-
-    const facilitySlots = state.facilitySlots.map(item => {
-      return {
-        from: datetimeToTimestring(item.from),
-        to: datetimeToTimestring(item.to)
-      };
-    });
-
     const newFacility = {
       name: state.facilityName,
       resources: state.facilityResources.join(","),
       deposit: isEmpty(state.facilityDeposit) ? 0 : state.facilityDeposit,
       price: isEmpty(state.facilityFee) ? 0 : state.facilityFee,
       confirmation: state.facilityConfirmation,
-      slots: facilitySlots
+      slots: state.facilitySlots
     };
 
     axios
