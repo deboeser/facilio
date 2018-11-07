@@ -135,7 +135,7 @@ const createResourcesAndSlots = (resources, slots) => {
 
 // Create a new facility
 router.post(
-  "/create/",
+  "/",
   passport.authenticate("jwt", { session: false }),
   minimumRole(roles.MANAGER),
   (req, res) => {
