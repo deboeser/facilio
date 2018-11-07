@@ -194,26 +194,11 @@ class AddFacility extends Component {
           />
         );
       case 1:
-        return (
-          <Step2
-            setSuperState={this.setSuperState.bind(this)}
-            superState={this.state}
-          />
-        );
+        return <Step2 setSuperState={this.setSuperState.bind(this)} superState={this.state} />;
       case 2:
-        return (
-          <Step3
-            setSuperState={this.setSuperState.bind(this)}
-            superState={this.state}
-          />
-        );
+        return <Step3 setSuperState={this.setSuperState.bind(this)} superState={this.state} />;
       case 3:
-        return (
-          <Finished
-            resetBase={this.resetComponent.bind(this)}
-            loading={this.state.saveLoading}
-          />
-        );
+        return <Finished resetBase={this.resetComponent.bind(this)} loading={this.state.saveLoading} />;
       default:
         return "Unknown step";
     }
@@ -231,15 +216,15 @@ class AddFacility extends Component {
 
     const newFacility = {
       name: state.facilityName,
-      resources: state.facilityResources.join(","),
-      deposit: isEmpty(state.facilityDeposit) ? 0 : state.facilityDeposit,
-      price: isEmpty(state.facilityFee) ? 0 : state.facilityFee,
+      resources: state.facilityResources,
+      deposit: isEmpty(state.facilityDeposit) ? 0 : Number(state.facilityDeposit),
+      fee: isEmpty(state.facilityFee) ? 0 : Number(state.facilityFee),
       confirmation: state.facilityConfirmation,
       slots: facilitySlots
     };
 
     axios
-      .post("/api/facility/create", newFacility)
+      .post("/api/facility/", newFacility)
       .then(res => {
         this.setState({ saveLoading: false });
       })
@@ -284,23 +269,15 @@ class AddFacility extends Component {
     return (
       <div className={classes.root}>
         <Paper className={classes.paper}>
-          <div className={classes.loadingPlaceholder}>
-            {this.state.loading && <LinearProgress />}
-          </div>
+          <div className={classes.loadingPlaceholder}>{this.state.loading && <LinearProgress />}</div>
           <div className={classes.headerSection}>
             <Typography variant="h3" gutterBottom>
               Add a new Facility
             </Typography>
-            <Stepper
-              steps={steps}
-              activeStep={activeStep}
-              skipped={this.state.skipped}
-            />
+            <Stepper steps={steps} activeStep={activeStep} skipped={this.state.skipped} />
           </div>
           <Divider />
-          <div className={classes.contentSection}>
-            {this.getStepContent(activeStep)}
-          </div>
+          <div className={classes.contentSection}>{this.getStepContent(activeStep)}</div>
           <Divider />
           {buttonSection}
         </Paper>
