@@ -1,5 +1,4 @@
 import { GET_FACILITIES, SET_FACILITIES_LOADING } from "../actions/types";
-import isEmpty from "../validation/is-empty";
 
 const initialState = {
   facilities: [],
