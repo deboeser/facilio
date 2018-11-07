@@ -228,12 +228,11 @@ class AddFacility extends Component {
       confirmation: state.facilityConfirmation,
       slots: state.facilitySlots
     };
-    console.log(newFacility);
+
     axios
       .post("/api/facility/create", newFacility)
       .then(res => {
         this.setState({ saveLoading: false });
-        console.log(res);
       })
       .catch(err => {
         this.setState({ saveLoading: false });
