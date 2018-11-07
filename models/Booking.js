@@ -23,7 +23,8 @@ const bookingSchema = new Schema({
   },
   timeslots: [
     {
-      type: Schema.Types.ObjectId
+      type: Schema.Types.ObjectId,
+      ref: "slots"
     }
   ],
   created: {

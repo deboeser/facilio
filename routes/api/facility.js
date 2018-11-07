@@ -5,6 +5,7 @@ const isEmpty = require("../../validation/is-empty");
 
 const Facility = require("../../models/Facility");
 const Resource = require("../../models/Resource");
+const Slot = require("../../models/Slot");
 const { minimumRole } = require("../../roles/authenticateRole");
 const { roles } = require("../../roles/roles");
 
@@ -103,6 +104,35 @@ router.get(
   }
 );
 
+const createResourcesAndSlots = (resources, slots) => {
+  return new Promise((resolve, reject) => {
+    let resourcePromises = [];
+    let slotPromises = [];
+
+    resources.forEach(item => {
+      resourcePromises.push(new Resource({ name: item }).save());
+    });
+
+    slots.forEach(item => {
+      slotPromises.push(new Slot({ from: item.from, to: item.to }).save());
+    });
+
+    Promise.all(resourcePromises)
+      .then(valuesRes => {
+        Promise.all(slotPromises)
+          .then(valuesSlt => {
+            const result = {
+              resourceIds: valuesRes,
+              slotIds: valuesSlt
+            };
+            resolve(result);
+          })
+          .catch(err => reject(err));
+      })
+      .catch(err => reject(err));
+  });
+};
+
 // Create a new facility
 router.post(
   "/create/",
@@ -122,19 +152,8 @@ router.post(
           return res.status(400).json(errors);
         }
 
-        let resourcePromises = [];
-        let resourcesIds = [];
-
-        req.body.resources.forEach(item => {
-          resourcePromises.push(new Resource({ name: item }).save());
-        });
-
-        Promise.all(resourcePromises)
-          .then(values => {
-            values.forEach(item => {
-              resourcesIds.push(item._id);
-            });
-
+        createResourcesAndSlots(req.body.resources, req.body.slots)
+          .then(result => {
             const newFacility = {
               name: req.body.name,
               imgurl: req.body.imgurl,
@@ -142,35 +161,20 @@ router.post(
               fee: req.body.fee,
               confirmation: req.body.confirmation,
               description: req.body.description,
-              resources: resourcesIds,
-              slots: req.body.slots
+              resources: result.resourceIds,
+              slots: result.slotIds
             };
 
             new Facility(newFacility)
               .save()
               .then(result => res.json(result))
-              .catch(errFac => {
-                let removePromises = [];
-                resourcesIds.forEach(item => {
-                  removePromises.push(Resource.findOneAndRemove({ _id: item }));
-                });
-                Promise.all(removePromises)
-                  .then(values =>
-                    res.status(500).json({
-                      resourcedeletion: "success",
-                      mongoErrorFac: errFac
-                    })
-                  )
-                  .catch(errRes =>
-                    res.status(500).json({
-                      error: "Could not delete resources",
-                      mongoErrorFac: errFac,
-                      mongoErrorRes: errRes
-                    })
-                  );
-              });
+              .catch(err =>
+                res.status(500).json("Facility could not be created")
+              );
           })
-          .catch(err => res.status(500).json(err));
+          .catch(err =>
+            res.status(500).json("Error in create slot and resources function")
+          );
       })
       .catch(err => res.status(400).json(err));
   }
@@ -317,20 +321,31 @@ router.delete(
         return res.status(400).json({ notfound: "Facility ID not found" });
       }
 
-      let removePromises = [];
+      let resourcePromises = [];
       result.resources.forEach(item => {
-        removePromises.push(Resource.findOneAndRemove({ _id: item }));
+        resourcePromises.push(Resource.findOneAndRemove({ _id: item }));
       });
 
-      Promise.all(removePromises)
+      let slotPromises = [];
+      result.slots.forEach(item => {
+        slotPromises.push(Slot.findOneAndRemove({ _id: item }));
+      });
+
+      Promise.all(resourcePromises)
         .then(values => {
-          Facility.findOneAndRemove({ _id: req.params.id })
-            .then(() => {
-              return res.json({ success: true });
+          Promise.all(slotPromises)
+            .then(values => {
+              Facility.findOneAndRemove({ _id: req.params.id })
+                .then(() => {
+                  return res.json({ success: true });
+                })
+                .catch(err =>
+                  res.status(500).json("Could not remove facility")
+                );
             })
-            .catch(err => res.status(500).json(err));
+            .catch(err => res.status(500).json("Could not remove all slots"));
         })
-        .catch(err => res.status(500).json(err));
+        .catch(err => res.status(500).json("Could not remove all resources"));
     });
   }
 );
