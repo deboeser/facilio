@@ -13,7 +13,7 @@ const facilitySchema = new Schema({
     type: Number,
     required: true
   },
-  price: {
+  fee: {
     type: Number,
     required: true
   },

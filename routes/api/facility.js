@@ -13,7 +13,6 @@ const sortByField = require("../../utils/sortByField");
 const {
   validateNewFacilityInput,
   validateModifyFacilityInput,
-  validateResourceInput,
   validateResourceRemoveInput,
   validateResourceAddInput
 } = require("../../validation/facility");
@@ -110,17 +109,9 @@ router.post(
   passport.authenticate("jwt", { session: false }),
   minimumRole(roles.MANAGER),
   (req, res) => {
-    let { errors, isValid, parsed } = validateNewFacilityInput(req.body);
+    let { errors, isValid } = validateNewFacilityInput(req.body);
 
     if (!isValid) {
-      return res.status(400).json(errors);
-    }
-
-    // Resource validity checking
-    const resourceValidation = validateResourceInput(req.body.resources);
-
-    if (!resourceValidation.isValid) {
-      errors = resourceValidation.errors;
       return res.status(400).json(errors);
     }
 
@@ -134,7 +125,7 @@ router.post(
         let resourcePromises = [];
         let resourcesIds = [];
 
-        resourceValidation.resources.forEach(item => {
+        req.body.resources.forEach(item => {
           resourcePromises.push(new Resource({ name: item }).save());
         });
 
@@ -147,9 +138,9 @@ router.post(
             const newFacility = {
               name: req.body.name,
               imgurl: req.body.imgurl,
-              deposit: parsed.depositNumeric,
-              price: parsed.priceNumeric,
-              confirmation: parsed.confirmation,
+              deposit: req.body.deposit,
+              fee: req.body.fee,
+              confirmation: req.body.confirmation,
               description: req.body.description,
               resources: resourcesIds,
               slots: req.body.slots
@@ -198,7 +189,7 @@ router.post(
     }
 
     const modifyFacility = {};
-    const fields = ["name", "imgurl", "deposit", "price", "confirmation"];
+    const fields = ["name", "imgurl", "deposit", "fee", "confirmation"];
 
     fields.forEach(item => {
       if (!isEmpty(req.body[item])) modifyFacility[item] = req.body[item];

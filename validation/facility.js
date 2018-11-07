@@ -3,16 +3,41 @@ const isEmpty = require("./is-empty");
 
 const validateNewFacilityInput = data => {
   let errors = {};
-  let parsed = {};
 
   data.name = !isEmpty(data.name) ? data.name : "";
   data.imgurl = !isEmpty(data.imgurl) ? data.imgurl : "";
   data.deposit = !isEmpty(data.deposit) ? data.deposit : "";
-  data.price = !isEmpty(data.price) ? data.price : "";
+  data.fee = !isEmpty(data.fee) ? data.fee : "";
   data.confirmation = !isEmpty(data.confirmation) ? data.confirmation : "";
 
+  // Validating the resources
+  if (isEmpty(data.resources)) {
+    errors.resources = "At least one resource is required";
+  } else {
+    data.resources.forEach(item => {
+      if (!Validator.isLength(item, { min: 3, max: 30 })) {
+        errors.resources = "Resource names must be between 3 and 30 characters";
+      }
+    });
+
+    if (new Set(data.resources).size !== data.resources.length) {
+      errors.resources = "Resources must have different names";
+    }
+  }
+
+  // Validating the slots
   if (isEmpty(data.slots)) {
     errors.slots = "At least one slot required";
+  } else {
+    data.slots.forEach(item => {
+      if (isEmpty(item.from)) {
+        errors.slotsFrom = "Each slots requires a from field";
+      }
+      if (isEmpty(item.to)) {
+        errors.slotsTo = "Each slots requires a to field";
+      }
+    });
+    // TODO: Validation of slot times are valid and if they overlap
   }
 
   if (Validator.isEmpty(data.name)) {
@@ -25,51 +50,41 @@ const validateNewFacilityInput = data => {
     errors.imgurl = "Image URL is not a valid URL";
   }
 
-  parsed.depositNumeric = Number(data.deposit);
-  parsed.priceNumeric = Number(data.price);
-
-  if (Validator.isEmpty(String(data.deposit))) {
+  if (isEmpty(data.deposit)) {
     errors.deposit = "Deposit field is required";
-  } else if (isNaN(parsed.depositNumeric)) {
+  } else if (typeof data.deposit !== "number") {
     errors.deposit = "Deposit must be a numeric value";
-  } else if (parsed.depositNumeric < 0) {
+  } else if (data.deposit < 0) {
     errors.deposit = "Deposit cannot be negative";
   }
 
-  if (Validator.isEmpty(String(data.price))) {
-    errors.price = "Price field is required";
-  } else if (isNaN(parsed.priceNumeric)) {
-    errors.price = "Price must be a numeric value";
-  } else if (parsed.priceNumeric < 0) {
-    errors.price = "Price cannot be negative";
+  if (isEmpty(data.fee)) {
+    errors.fee = "Fee field is required";
+  } else if (typeof data.fee !== "number") {
+    errors.fee = "Fee must be a numeric value";
+  } else if (data.fee < 0) {
+    errors.fee = "Fee cannot be negative";
   }
-
-  parsed.confirmation = data.confirmation === "true";
 
   if (Validator.isEmpty(String(data.confirmation))) {
     errors.confirmation = "Confirmation field is required";
-  } else if (
-    String(data.confirmation) !== "true" &&
-    String(data.confirmation) !== "false"
-  ) {
-    errors.confirmation = "Confirmation must be true or false";
+  } else if (typeof data.confirmation !== "boolean") {
+    errors.confirmation = "Confirmation must be of type boolean";
   }
 
   return {
     errors,
-    isValid: isEmpty(errors),
-    parsed
+    isValid: isEmpty(errors)
   };
 };
 
 const validateModifyFacilityInput = data => {
   let errors = {};
-  let parsed = {};
 
   data.name = !isEmpty(data.name) ? data.name : "";
   data.imgurl = !isEmpty(data.imgurl) ? data.imgurl : "";
   data.deposit = !isEmpty(data.deposit) ? data.deposit : "";
-  data.price = !isEmpty(data.price) ? data.price : "";
+  data.fee = !isEmpty(data.fee) ? data.fee : "";
   data.confirmation = !isEmpty(data.confirmation) ? data.confirmation : "";
   data.description = !isEmpty(data.description) ? data.description : "";
 
@@ -77,15 +92,12 @@ const validateModifyFacilityInput = data => {
     isEmpty(data.name) &&
     isEmpty(data.imgurl) &&
     isEmpty(data.deposit) &&
-    isEmpty(data.price) &&
+    isEmpty(data.fee) &&
     isEmpty(data.confirmation) &&
     isEmpty(data.description)
   ) {
     errors.nochange = "At least one filed must be changed.";
   }
-
-  parsed.depositNumeric = Number(data.deposit);
-  parsed.priceNumeric = Number(data.price);
 
   if (Validator.isEmpty(data.id)) {
     errors.id = "Facility ID is required";
@@ -103,60 +115,30 @@ const validateModifyFacilityInput = data => {
   }
 
   if (!Validator.isEmpty(data.deposit)) {
-    if (isNaN(parsed.depositNumeric)) {
+    if (typeof data.deposit !== "number") {
       errors.deposit = "Deposit must be a numeric value";
-    } else if (parsed.depositNumeric < 0) {
+    } else if (data.deposit < 0) {
       errors.deposit = "Deposit cannot be negative";
     }
   }
 
-  if (!Validator.isEmpty(data.price)) {
-    if (isNaN(parsed.priceNumeric)) {
-      errors.price = "Price must be a numeric value";
-    } else if (parsed.priceNumeric < 0) {
-      errors.price = "Price cannot be negative";
+  if (!Validator.isEmpty(data.fee)) {
+    if (typeof data.fee !== "number") {
+      errors.fee = "Fee must be a numeric value";
+    } else if (data.fee < 0) {
+      errors.fee = "Fee cannot be negative";
     }
   }
 
-  parsed.confirmation = data.confirmation === "true";
-
-  if (!Validator.isEmpty(data.confirmation)) {
-    if (data.confirmation !== "true" && data.confirmation !== "false") {
-      errors.confirmation = "Confirmation must be true or false";
-    }
-  }
-
-  return {
-    errors,
-    isValid: isEmpty(errors),
-    parsed
-  };
-};
-
-const validateResourceInput = data => {
-  let errors = {};
-  let resources;
-
-  if (isEmpty(data)) {
-    errors.resources = "At least one resource is required";
-  } else {
-    resources = data.split(",");
-
-    resources.forEach(item => {
-      if (!Validator.isLength(item, { min: 3, max: 30 })) {
-        errors.resources = "Resource names must be between 3 and 30 characters";
-      }
-    });
-
-    if (new Set(resources).size !== resources.length) {
-      errors.resources = "Resources must have different names";
+  if (!Validator.isEmpty(String(data.confirmation))) {
+    if (typeof data.confirmation !== "boolean") {
+      errors.confirmation = "Confirmation must be of type boolean";
     }
   }
 
   return {
     errors,
-    isValid: isEmpty(errors),
-    resources: resources
+    isValid: isEmpty(errors)
   };
 };
 
@@ -203,7 +185,6 @@ const validateResourceAddInput = data => {
 module.exports = {
   validateNewFacilityInput,
   validateModifyFacilityInput,
-  validateResourceInput,
   validateResourceRemoveInput,
   validateResourceAddInput
 };
