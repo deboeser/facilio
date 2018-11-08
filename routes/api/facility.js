@@ -5,6 +5,7 @@ const isEmpty = require("../../validation/is-empty");
 
 const Facility = require("../../models/Facility");
 const Resource = require("../../models/Resource");
+const Slot = require("../../models/Slot");
 const { minimumRole } = require("../../roles/authenticateRole");
 const { roles } = require("../../roles/roles");
 
@@ -13,7 +14,6 @@ const sortByField = require("../../utils/sortByField");
 const {
   validateNewFacilityInput,
   validateModifyFacilityInput,
-  validateResourceInput,
   validateResourceRemoveInput,
   validateResourceAddInput
 } = require("../../validation/facility");
@@ -104,23 +104,44 @@ router.get(
   }
 );
 
+const createResourcesAndSlots = (resources, slots) => {
+  return new Promise((resolve, reject) => {
+    let resourcePromises = [];
+    let slotPromises = [];
+
+    resources.forEach(item => {
+      resourcePromises.push(new Resource({ name: item }).save());
+    });
+
+    slots.forEach(item => {
+      slotPromises.push(new Slot({ from: item.from, to: item.to }).save());
+    });
+
+    Promise.all(resourcePromises)
+      .then(valuesRes => {
+        Promise.all(slotPromises)
+          .then(valuesSlt => {
+            const result = {
+              resourceIds: valuesRes,
+              slotIds: valuesSlt
+            };
+            resolve(result);
+          })
+          .catch(err => reject(err));
+      })
+      .catch(err => reject(err));
+  });
+};
+
 // Create a new facility
 router.post(
-  "/create/",
+  "/",
   passport.authenticate("jwt", { session: false }),
   minimumRole(roles.MANAGER),
   (req, res) => {
-    let { errors, isValid, parsed } = validateNewFacilityInput(req.body);
+    let { errors, isValid } = validateNewFacilityInput(req.body);
 
     if (!isValid) {
-      return res.status(400).json(errors);
-    }
-
-    // Resource validity checking
-    const resourceValidation = validateResourceInput(req.body.resources);
-
-    if (!resourceValidation.isValid) {
-      errors = resourceValidation.errors;
       return res.status(400).json(errors);
     }
 
@@ -131,55 +152,25 @@ router.post(
           return res.status(400).json(errors);
         }
 
-        let resourcePromises = [];
-        let resourcesIds = [];
-
-        resourceValidation.resources.forEach(item => {
-          resourcePromises.push(new Resource({ name: item }).save());
-        });
-
-        Promise.all(resourcePromises)
-          .then(values => {
-            values.forEach(item => {
-              resourcesIds.push(item._id);
-            });
-
+        createResourcesAndSlots(req.body.resources, req.body.slots)
+          .then(result => {
             const newFacility = {
               name: req.body.name,
               imgurl: req.body.imgurl,
-              deposit: parsed.depositNumeric,
-              price: parsed.priceNumeric,
-              confirmation: parsed.confirmation,
+              deposit: req.body.deposit,
+              fee: req.body.fee,
+              confirmation: req.body.confirmation,
               description: req.body.description,
-              resources: resourcesIds,
-              slots: req.body.slots
+              resources: result.resourceIds,
+              slots: result.slotIds
             };
 
             new Facility(newFacility)
               .save()
               .then(result => res.json(result))
-              .catch(errFac => {
-                let removePromises = [];
-                resourcesIds.forEach(item => {
-                  removePromises.push(Resource.findOneAndRemove({ _id: item }));
-                });
-                Promise.all(removePromises)
-                  .then(values =>
-                    res.status(500).json({
-                      resourcedeletion: "success",
-                      mongoErrorFac: errFac
-                    })
-                  )
-                  .catch(errRes =>
-                    res.status(500).json({
-                      error: "Could not delete resources",
-                      mongoErrorFac: errFac,
-                      mongoErrorRes: errRes
-                    })
-                  );
-              });
+              .catch(err => res.status(500).json("Facility could not be created"));
           })
-          .catch(err => res.status(500).json(err));
+          .catch(err => res.status(500).json("Error in create slot and resources function"));
       })
       .catch(err => res.status(400).json(err));
   }
@@ -198,18 +189,20 @@ router.post(
     }
 
     const modifyFacility = {};
-    const fields = ["name", "imgurl", "deposit", "price", "confirmation"];
+    const fields = ["name", "imgurl", "deposit", "fee", "confirmation"];
 
     fields.forEach(item => {
       if (!isEmpty(req.body[item])) modifyFacility[item] = req.body[item];
     });
 
-    Facility.findOneAndUpdate(
-      { _id: req.body.id },
-      { $set: modifyFacility },
-      { new: true }
-    )
-      .then(result => res.json(result))
+    Facility.findOneAndUpdate({ _id: req.body.id }, { $set: modifyFacility }, { new: true })
+      .then(result => {
+        if (!result) {
+          errors.notfound = "Facility with ID not found";
+          return res.status(404).json(errors);
+        }
+        return res.json({ success: true });
+      })
       .catch(err => res.status(400).json(err));
   }
 );
@@ -238,8 +231,7 @@ router.delete(
         return res.status(400).json(errors);
       }
       if (removeIndex < 0) {
-        errors.notfound =
-          "Resource ID could not be found under given facility ID";
+        errors.notfound = "Resource ID could not be found under given facility ID";
         return res.status(404).json(errors);
       }
       // TODO: return error if bookings on this resource
@@ -253,11 +245,15 @@ router.delete(
         { new: true }
       )
         .then(result => {
+          if (!result) {
+            errors.notfound = "Facility with ID not found";
+            return res.status(404).json(errors);
+          }
           // Remove resource from database
           Resource.findOneAndRemove({ _id: req.body.resourceId })
-            .then(() => res.json(result))
+            .then(() => res.json({ success: true }))
             .catch(err => {
-              res.status(404).json(err);
+              res.status(500).json(err);
             });
         })
         .catch(err => {
@@ -326,20 +322,29 @@ router.delete(
         return res.status(400).json({ notfound: "Facility ID not found" });
       }
 
-      let removePromises = [];
+      let resourcePromises = [];
       result.resources.forEach(item => {
-        removePromises.push(Resource.findOneAndRemove({ _id: item }));
+        resourcePromises.push(Resource.findOneAndRemove({ _id: item }));
       });
 
-      Promise.all(removePromises)
+      let slotPromises = [];
+      result.slots.forEach(item => {
+        slotPromises.push(Slot.findOneAndRemove({ _id: item }));
+      });
+
+      Promise.all(resourcePromises)
         .then(values => {
-          Facility.findOneAndRemove({ _id: req.params.id })
-            .then(() => {
-              return res.json({ success: true });
+          Promise.all(slotPromises)
+            .then(values => {
+              Facility.findOneAndRemove({ _id: req.params.id })
+                .then(() => {
+                  return res.json({ success: true });
+                })
+                .catch(err => res.status(500).json("Could not remove facility"));
             })
-            .catch(err => res.status(500).json(err));
+            .catch(err => res.status(500).json("Could not remove all slots"));
         })
-        .catch(err => res.status(500).json(err));
+        .catch(err => res.status(500).json("Could not remove all resources"));
     });
   }
 );
