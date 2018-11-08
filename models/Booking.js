@@ -47,6 +47,11 @@ const bookingSchema = new Schema({
     type: Boolean,
     default: false
   },
+  cancelledBy: {
+    type: Schema.Types.ObjectId,
+    ref: "users",
+    required: false
+  },
   depositConfirmedBy: {
     type: Schema.Types.ObjectId,
     ref: "users",
