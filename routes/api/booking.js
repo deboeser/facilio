@@ -22,6 +22,37 @@ router.get(
 
     Booking.find()
       .populate("user", ["email"])
+      .populate("cancelledBy", ["email"])
+      .populate("depositConfirmedBy", ["email"])
+      .populate("feeConfirmedBy", ["email"])
+      .populate("bookingConfirmedBy", ["email"])
+      .populate("facility", ["name"])
+      .populate("resource", ["name"])
+      .populate("timeslots", ["from", "to"])
+      .sort({ date: 1 })
+      .then(result => {
+        if (!result) {
+          errors.notfound = "No entries in database";
+          return res.status(404).json(errors);
+        }
+        return res.json(result);
+      })
+      .catch(err => {
+        res.status(500).json(err);
+      });
+  }
+);
+
+// Get my bookings
+router.get(
+  "/",
+  passport.authenticate("jwt", { session: false }),
+  minimumRole(roles.USER),
+  (req, res) => {
+    const errors = {};
+
+    Booking.find({ user: req.user.id })
+      .populate("user", ["email"])
       .populate("facility", ["name"])
       .populate("resource", ["name"])
       .populate("timeslots", ["from", "to"])
