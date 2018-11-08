@@ -20,7 +20,16 @@ router.get(
   (req, res) => {
     const errors = {};
 
-    Booking.find()
+    let query = {};
+
+    if (req.query.showpast === "true") {
+    } else {
+      const today = new Date();
+      today.setUTCHours(0, 0, 0, 0);
+      query.date = { $gte: today };
+    }
+
+    Booking.find(query)
       .populate("user", ["email"])
       .populate("cancelledBy", ["email"])
       .populate("depositConfirmedBy", ["email"])
@@ -51,7 +60,16 @@ router.get(
   (req, res) => {
     const errors = {};
 
-    Booking.find({ user: req.user.id })
+    let query = { user: req.user.id };
+
+    if (req.query.showpast === "true") {
+    } else {
+      const today = new Date();
+      today.setUTCHours(0, 0, 0, 0);
+      query.date = { $gte: today };
+    }
+
+    Booking.find(query)
       .populate("user", ["email"])
       .populate("facility", ["name"])
       .populate("resource", ["name"])
