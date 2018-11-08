@@ -66,6 +66,7 @@ router.post(
   }
 );
 
+// Update booking status
 router.post(
   "/update",
   passport.authenticate("jwt", { session: false }),

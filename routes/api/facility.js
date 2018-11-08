@@ -168,13 +168,9 @@ router.post(
             new Facility(newFacility)
               .save()
               .then(result => res.json(result))
-              .catch(err =>
-                res.status(500).json("Facility could not be created")
-              );
+              .catch(err => res.status(500).json("Facility could not be created"));
           })
-          .catch(err =>
-            res.status(500).json("Error in create slot and resources function")
-          );
+          .catch(err => res.status(500).json("Error in create slot and resources function"));
       })
       .catch(err => res.status(400).json(err));
   }
@@ -199,12 +195,14 @@ router.post(
       if (!isEmpty(req.body[item])) modifyFacility[item] = req.body[item];
     });
 
-    Facility.findOneAndUpdate(
-      { _id: req.body.id },
-      { $set: modifyFacility },
-      { new: true }
-    )
-      .then(result => res.json(result))
+    Facility.findOneAndUpdate({ _id: req.body.id }, { $set: modifyFacility }, { new: true })
+      .then(result => {
+        if (!result) {
+          errors.notfound = "Facility with ID not found";
+          return res.status(404).json(errors);
+        }
+        return res.json({ success: true });
+      })
       .catch(err => res.status(400).json(err));
   }
 );
@@ -233,8 +231,7 @@ router.delete(
         return res.status(400).json(errors);
       }
       if (removeIndex < 0) {
-        errors.notfound =
-          "Resource ID could not be found under given facility ID";
+        errors.notfound = "Resource ID could not be found under given facility ID";
         return res.status(404).json(errors);
       }
       // TODO: return error if bookings on this resource
@@ -248,11 +245,15 @@ router.delete(
         { new: true }
       )
         .then(result => {
+          if (!result) {
+            errors.notfound = "Facility with ID not found";
+            return res.status(404).json(errors);
+          }
           // Remove resource from database
           Resource.findOneAndRemove({ _id: req.body.resourceId })
-            .then(() => res.json(result))
+            .then(() => res.json({ success: true }))
             .catch(err => {
-              res.status(404).json(err);
+              res.status(500).json(err);
             });
         })
         .catch(err => {
@@ -339,9 +340,7 @@ router.delete(
                 .then(() => {
                   return res.json({ success: true });
                 })
-                .catch(err =>
-                  res.status(500).json("Could not remove facility")
-                );
+                .catch(err => res.status(500).json("Could not remove facility"));
             })
             .catch(err => res.status(500).json("Could not remove all slots"));
         })

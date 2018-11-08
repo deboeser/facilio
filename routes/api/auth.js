@@ -93,17 +93,12 @@ router.post("/login", (req, res) => {
           email: user.email,
           role: user.role
         };
-        jwt.sign(
-          payload,
-          keys.secret,
-          { expiresIn: serverconfig.loginExpiry },
-          (err, token) => {
-            res.json({
-              success: true,
-              token: "Bearer " + token
-            });
-          }
-        );
+        jwt.sign(payload, keys.secret, { expiresIn: serverconfig.loginExpiry }, (err, token) => {
+          res.json({
+            success: true,
+            token: "Bearer " + token
+          });
+        });
       } else {
         errors.password = "Password incorrect";
         return res.status(400).json(errors);
@@ -134,44 +129,42 @@ router.get(
  * @desc    Changes the password of the user
  * @access  private
  */
-router.post(
-  "/change-password",
-  passport.authenticate("jwt", { session: false }),
-  (req, res) => {
-    const { errors, isValid } = validateChangePasswordInput(req.body);
+router.post("/change-password", passport.authenticate("jwt", { session: false }), (req, res) => {
+  const { errors, isValid } = validateChangePasswordInput(req.body);
 
-    if (!isValid) {
-      return res.status(400).json(errors);
-    }
-
-    bcrypt.compare(req.body.password, req.user.password).then(isMatch => {
-      if (!isMatch) {
-        errors.password = "Password incorrect";
-        return res.status(401).json(errors);
-      } else {
-        const newUserData = {
-          password: req.body.passwordNew1
-        };
-
-        // Password encryption with salt
-        bcrypt.genSalt(10, (err, salt) => {
-          bcrypt.hash(newUserData.password, salt, (err, hash) => {
-            if (err) throw err;
-            newUserData.password = hash;
-
-            User.findOneAndUpdate(
-              { email: req.user.email },
-              { $set: newUserData },
-              { new: true }
-            )
-              .then(usr => res.json({ success: true }))
-              .catch(err => console.log(err));
-          });
-        });
-      }
-    });
+  if (!isValid) {
+    return res.status(400).json(errors);
   }
-);
+
+  bcrypt.compare(req.body.password, req.user.password).then(isMatch => {
+    if (!isMatch) {
+      errors.password = "Password incorrect";
+      return res.status(401).json(errors);
+    } else {
+      const newUserData = {
+        password: req.body.passwordNew1
+      };
+
+      // Password encryption with salt
+      bcrypt.genSalt(10, (err, salt) => {
+        bcrypt.hash(newUserData.password, salt, (err, hash) => {
+          if (err) throw err;
+          newUserData.password = hash;
+
+          User.findOneAndUpdate({ email: req.user.email }, { $set: newUserData }, { new: true })
+            .then(result => {
+              if (!result) {
+                errors.notfound = "User with this ID not found";
+                return res.status(404).json(errors);
+              }
+              res.json({ success: true });
+            })
+            .catch(err => console.log(err));
+        });
+      });
+    }
+  });
+});
 
 /**
  * @route   POST api/auth/reset-password
@@ -213,9 +206,7 @@ router.post("/reset-password", (req, res) => {
               } with your OTP: ${reset.otp}`,
               html: `<h1>Reset Link</h1><a href='http://${
                 req.headers["x-forwarded-host"]
-              }/reset-password/${
-                reset.token
-              }'>Click here to reset your password</a><p>Your OTP: ${
+              }/reset-password/${reset.token}'>Click here to reset your password</a><p>Your OTP: ${
                 reset.otp
               }</p>`
             };
@@ -300,11 +291,7 @@ router.post("/reset-password/:token", (req, res) => {
             remainingAttempts: reset.remainingAttempts - 1
           };
 
-          Reset.findOneAndUpdate(
-            { _id: reset._id },
-            { $set: updateReset },
-            { new: true }
-          )
+          Reset.findOneAndUpdate({ _id: reset._id }, { $set: updateReset }, { new: true })
             .then(reset => {})
             .catch(err => console.log(err));
 
@@ -328,12 +315,14 @@ router.post("/reset-password/:token", (req, res) => {
             if (err) throw err;
             newUserData.password = hash;
 
-            User.findOneAndUpdate(
-              { _id: reset.user },
-              { $set: newUserData },
-              { new: true }
-            )
-              .then(usr => res.json({ success: true }))
+            User.findOneAndUpdate({ _id: reset.user }, { $set: newUserData }, { new: true })
+              .then(result => {
+                if (!result) {
+                  errors.notfound = "User with ID not found";
+                  return res.status(404).json(errors);
+                }
+                return res.json({ success: true });
+              })
               .catch(err => console.log(err));
           });
         });
