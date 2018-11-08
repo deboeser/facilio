@@ -7,6 +7,11 @@ const Booking = require("../../models/Booking");
 const { minimumRole } = require("../../roles/authenticateRole");
 const { roles } = require("../../roles/roles");
 
+const {
+  validateNewBookingInput,
+  validateBookingStatusUpdate
+} = require("../../validation/booking");
+
 // Get all bookings
 router.get(
   "/all",
@@ -34,11 +39,18 @@ router.get(
   }
 );
 
+// Create new booking
 router.post(
   "/",
   passport.authenticate("jwt", { session: false }),
   minimumRole(roles.USER),
   (req, res) => {
+    const { errors, isValid } = validateNewBookingInput(req.body);
+
+    if (!isValid) {
+      return res.status(400).json(errors);
+    }
+
     const newBooking = {
       user: req.user.id,
       facility: req.body.facility,
@@ -51,6 +63,53 @@ router.post(
       .save()
       .then(result => res.json(result))
       .catch(err => res.status(500).json(err.response.data));
+  }
+);
+
+router.post(
+  "/update",
+  passport.authenticate("jwt", { session: false }),
+  minimumRole(roles.MANAGER),
+  (req, res) => {
+    const { errors, isValid } = validateBookingStatusUpdate(req.body);
+
+    if (!isValid) {
+      return res.status(400).json(errors);
+    }
+
+    let update = {};
+
+    switch (req.body.action) {
+      case "cancel":
+        update.cancelled = true;
+        update.cancelledBy = req.user.id;
+        break;
+      case "confirmDeposit":
+        update.depositPaid = true;
+        update.depositConfirmedBy = req.user.id;
+        break;
+      case "confirmFee":
+        update.feePaid = true;
+        update.feeConfirmedBy = req.user.id;
+        break;
+      case "confirmBooking":
+        update.confirmed = true;
+        update.bookingConfirmedBy = req.user.id;
+        break;
+    }
+
+    Booking.findOneAndUpdate({ _id: req.body.id }, { $set: update }, { new: true })
+      .then(result => {
+        if (!result) {
+          errors.notfound = "Booking with this ID not found";
+          return res.status(404).json(errors);
+        }
+        return res.json({ success: true });
+      })
+      .catch(err => {
+        console.log(err.response.data);
+        return res.status(500).json({ error: "Internal Server Error" });
+      });
   }
 );
 
