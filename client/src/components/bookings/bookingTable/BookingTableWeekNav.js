@@ -10,9 +10,7 @@ import PrevIcon from "@material-ui/icons/NavigateBefore";
 import Button from "../../common/Button";
 
 const styles = theme => ({
-  root: {
-    // borderBottom: `1px solid ${theme.palette.grey[300]}`
-  },
+  root: {},
   weekWrapper: {
     display: "flex",
     flexDirection: "row",
@@ -47,11 +45,18 @@ const styles = theme => ({
 
 const BookingTableWeekNav = props => {
   const { classes } = props;
+
   return (
     <div className={classes.root}>
       <div className={classes.weekWrapper}>
         <div className={classes.weekButton}>
-          <Button color="primary" size="small" className={classes.btn} onClick={props.onPrevWeek}>
+          <Button
+            color="primary"
+            size="small"
+            className={classes.btn}
+            onClick={props.onPrevWeek}
+            disabled={props.prevDisabled}
+          >
             <PrevIcon />
             <span className={classes.buttonText}>Previous Week</span>
           </Button>
@@ -60,7 +65,13 @@ const BookingTableWeekNav = props => {
           {props.week}
         </Typography>
         <div className={classes.weekButton}>
-          <Button color="primary" size="small" className={classes.btn} onClick={props.onNextWeek}>
+          <Button
+            color="primary"
+            size="small"
+            className={classes.btn}
+            onClick={props.onNextWeek}
+            disabled={props.nextDisabled}
+          >
             <span className={classes.buttonText}>Next Week</span>
             <NextIcon />
           </Button>
@@ -73,7 +84,9 @@ const BookingTableWeekNav = props => {
 BookingTableWeekNav.propTypes = {
   week: PropTypes.string.isRequired,
   onNextWeek: PropTypes.func.isRequired,
-  onPrevWeek: PropTypes.func.isRequired
+  onPrevWeek: PropTypes.func.isRequired,
+  nextDisabled: PropTypes.bool.isRequired,
+  prevDisabled: PropTypes.bool.isRequired
 };
 
 export default withStyles(styles, { withTheme: true })(BookingTableWeekNav);

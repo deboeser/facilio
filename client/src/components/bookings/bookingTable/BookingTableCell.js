@@ -13,7 +13,7 @@ const styles = theme => ({
     flexGrow: 1,
     padding: theme.spacing.unit * 1,
     textAlign: "center",
-    minWidth: theme.spacing.unit * 5,
+    minWidth: theme.spacing.unit * 6,
     borderBottom: `1px solid ${theme.palette.grey[300]}`
   },
   iconWrapper: {
@@ -34,7 +34,7 @@ const BookingTablCell = props => {
 
   const normalCell = key => (
     <div className={classes.tableCell}>
-      <Checkbox />
+      <Checkbox color="primary" />
     </div>
   );
 

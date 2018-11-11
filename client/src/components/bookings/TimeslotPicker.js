@@ -14,8 +14,7 @@ import { getMonday, offsetDate, getTimeSpanString, getWeek } from "../../utils/t
 const styles = theme => {
   return {
     root: {
-      width: "100%",
-      marginTop: theme.spacing.unit * 3
+      width: "100%"
     },
     table: {
       display: "flex",
@@ -56,12 +55,20 @@ class OwnTable extends Component {
   render() {
     const { classes } = this.props;
 
+    let nextDisabled = false;
+    let prevDisabled = false;
+    if (this.state.monday <= Date.now()) {
+      prevDisabled = true;
+    }
+
     return (
       <div className={classes.root}>
         <BookingTableWeekNav
           week={getTimeSpanString(this.state.monday, offsetDate(this.state.monday, 6))}
           onNextWeek={this.onNextWeek.bind(this)}
           onPrevWeek={this.onPrevWeek.bind(this)}
+          prevDisabled={prevDisabled}
+          nextDisabled={nextDisabled}
         />
         <Paper>
           <div className={classes.table}>
