@@ -61,7 +61,8 @@ const theme = createMuiTheme({
     fontFamily: "Raleway",
     body2: {
       fontWeight: 400
-    }
+    },
+    useNextVariants: true
   },
   singleDialog: {
     width: 400
@@ -74,8 +75,8 @@ class App extends Component {
     console.log(theme);
 
     return (
-      <Provider store={store}>
-        <MuiThemeProvider theme={theme}>
+      <MuiThemeProvider theme={theme}>
+        <Provider store={store}>
           <MuiPickersUtilsProvider utils={MomentUtils}>
             <Router>
               <div className="App" id="app">
@@ -87,8 +88,8 @@ class App extends Component {
               </div>
             </Router>
           </MuiPickersUtilsProvider>
-        </MuiThemeProvider>
-      </Provider>
+        </Provider>
+      </MuiThemeProvider>
     );
   }
 }
