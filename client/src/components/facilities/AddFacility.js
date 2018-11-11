@@ -16,7 +16,7 @@ import Step3 from "./AddFacilitySteps/Step3";
 import Finished from "./AddFacilitySteps/Finished";
 
 import isEmpty from "../../validation/is-empty";
-import { datetimeToTimestring } from "../../utils/timeDateConversion";
+import { datetimeToTimestring } from "../../utils/timeDateUtils";
 
 const styles = theme => ({
   root: {
