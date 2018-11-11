@@ -5,7 +5,8 @@ const styles = theme => ({
   tooltip: {
     fontWeight: 500,
     fontSize: theme.typography.caption.fontSize
-  }
+  },
+  popper: {}
 });
 
 export default withStyles(styles, { withTheme: true })(Tooltip);

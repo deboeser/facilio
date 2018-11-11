@@ -198,7 +198,9 @@ class AddFacility extends Component {
       case 2:
         return <Step3 setSuperState={this.setSuperState.bind(this)} superState={this.state} />;
       case 3:
-        return <Finished resetBase={this.resetComponent.bind(this)} loading={this.state.saveLoading} />;
+        return (
+          <Finished resetBase={this.resetComponent.bind(this)} loading={this.state.saveLoading} />
+        );
       default:
         return "Unknown step";
     }
@@ -269,7 +271,9 @@ class AddFacility extends Component {
     return (
       <div className={classes.root}>
         <Paper className={classes.paper}>
-          <div className={classes.loadingPlaceholder}>{this.state.loading && <LinearProgress />}</div>
+          <div className={classes.loadingPlaceholder}>
+            {this.state.loading && <LinearProgress />}
+          </div>
           <div className={classes.headerSection}>
             <Typography variant="h3" gutterBottom>
               Add a new Facility
