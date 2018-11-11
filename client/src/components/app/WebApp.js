@@ -7,9 +7,11 @@ import Grid from "@material-ui/core/Grid";
 import { roles } from "../../roles/roles";
 
 import NavBar from "./NavBar";
+import ProtectedRoute from "../common/ProtectedRoute";
+
 import Facilities from "../facilities/Facilities";
 import AddFacility from "../facilities/AddFacility";
-import ProtectedRoute from "../common/ProtectedRoute";
+import TimeslotPicker from "../bookings/TimeslotPicker";
 
 const styles = theme => ({
   root: {
@@ -63,6 +65,13 @@ class WebApp extends Component {
                     path={`${match.path}/add-facility`}
                     component={AddFacility}
                     requiredRole={roles.MANAGER}
+                  />
+                </Switch>
+                <Switch>
+                  <ProtectedRoute
+                    path={`${match.path}/own`}
+                    component={TimeslotPicker}
+                    requiredRole={roles.NOROLE}
                   />
                 </Switch>
               </div>
