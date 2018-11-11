@@ -12,6 +12,8 @@ import Grid from "@material-ui/core/Grid";
 import Button from "../common/Button";
 import Can from "../common/Can";
 
+import SideNav from "./SideNav";
+
 const styles = theme => ({
   root: {
     flexGrow: 1,
@@ -30,13 +32,28 @@ const styles = theme => ({
     paddingTop: theme.spacing.unit * 1.5,
     paddingBottom: theme.spacing.unit * 1.5,
     paddingLeft: theme.spacing.unit * 2,
-    paddingRight: theme.spacing.unit * 2
+    paddingRight: theme.spacing.unit * 2,
+    [theme.breakpoints.down(theme.mobileBreak)]: {
+      paddingTop: theme.spacing.unit * 1.5 - 6,
+      paddingBottom: theme.spacing.unit * 1.5 - 6
+    }
   },
   menuLeft: {
     float: "left"
   },
   menuRight: {
     float: "right"
+  },
+  menuScreen: {
+    [theme.breakpoints.down(theme.mobileBreak)]: {
+      display: "none"
+    }
+  },
+  menuPhone: {
+    display: "none",
+    [theme.breakpoints.down(theme.mobileBreak)]: {
+      display: "block"
+    }
   },
   button: {
     marginLeft: theme.spacing.unit * 0.5,
@@ -59,8 +76,14 @@ class NavBar extends Component {
     let menuLeft;
     let menuRight;
 
+    const menuIcon = (
+      <div className={classes.menuPhone}>
+        <SideNav />
+      </div>
+    );
+
     menuLeft = (
-      <div>
+      <div className={classes.menuScreen}>
         <Button className={classes.button} white>
           Dashboard
         </Button>
@@ -90,7 +113,7 @@ class NavBar extends Component {
     );
 
     menuRight = (
-      <div>
+      <div className={classes.menuScreen}>
         <Button
           white
           className={classes.button}
@@ -107,7 +130,10 @@ class NavBar extends Component {
       <div>
         <Grid container className={classes.root} spacing={0}>
           <Grid item xs={12} className={classes.menu}>
-            <div className={classes.menuLeft}>{menuLeft}</div>
+            <div className={classes.menuLeft}>
+              {menuLeft}
+              {menuIcon}
+            </div>
             <div className={classes.menuRight}>{menuRight}</div>
           </Grid>
         </Grid>

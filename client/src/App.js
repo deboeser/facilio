@@ -54,8 +54,7 @@ const theme = createMuiTheme({
     secondary: secondaryColor,
     warning: red,
     gradients: {
-      tealBlue:
-        "linear-gradient(to right, rgb(29, 130, 147) 0%, rgb(32, 96, 160) 100%)"
+      tealBlue: "linear-gradient(to right, rgb(29, 130, 147) 0%, rgb(32, 96, 160) 100%)"
     }
   },
   typography: {
@@ -66,7 +65,8 @@ const theme = createMuiTheme({
   },
   singleDialog: {
     width: 400
-  }
+  },
+  mobileBreak: "xs"
 });
 
 class App extends Component {
